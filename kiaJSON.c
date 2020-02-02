@@ -95,7 +95,7 @@ void kiaJSON_addItem2Array(kiaJSON *sourceArray, kiaJSON *item)
     }
 }
 
-void kiaJSON_printUnformatted(kiaJSON *source)
+void kiaJSON_printUnformatted2Console(kiaJSON *source)
 {
     if (source -> type == single)
     {
@@ -105,7 +105,7 @@ void kiaJSON_printUnformatted(kiaJSON *source)
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted(source -> next);
+            kiaJSON_printUnformatted2Console(source -> next);
         }
     }
     else if (source -> type == array)
@@ -114,12 +114,12 @@ void kiaJSON_printUnformatted(kiaJSON *source)
             printf("\"%s\":", source -> name);
         printf("[");
         if (source -> child != NULL)
-            kiaJSON_printUnformatted(source -> child);
+            kiaJSON_printUnformatted2Console(source -> child);
         printf("]");
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted(source -> next);
+            kiaJSON_printUnformatted2Console(source -> next);
         }
     }
     else if (source -> type == object)
@@ -128,12 +128,82 @@ void kiaJSON_printUnformatted(kiaJSON *source)
             printf("\"%s\":", source -> name);
         printf("{");
         if (source -> child != NULL)
-            kiaJSON_printUnformatted(source -> child);
+            kiaJSON_printUnformatted2Console(source -> child);
         printf("}");    
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted(source -> next);
+            kiaJSON_printUnformatted2Console(source -> next);
         }   
     }
+}
+
+char *kiaJSON_printUnformatted (kiaJSON *source)
+{
+    char *result = calloc(1, 100);
+    if (source -> type == single)
+    {
+        if (strcmp(source -> name, ""))
+        {
+            strcat(result, "\"");
+            strcat(result, source -> name);
+            strcat(result, "\":");
+        }
+        strcat(result, "\"");
+        strcat(result, source -> stringVal);
+        strcat(result, "\"");
+        if (source -> next != NULL)
+        {
+            strcat(result, ",");
+            strcat(result, kiaJSON_printUnformatted(source -> next));
+        }
+    }
+    else if (source -> type == array)
+    {
+        if (strcmp(source -> name, ""))
+        {
+            strcat(result, "\"");
+            strcat(result, source -> name);
+            strcat(result, "\":");
+        }
+        strcat(result, "[");
+        if (source -> child != NULL)
+            strcat(result, kiaJSON_printUnformatted(source -> child));
+        strcat(result, "]");
+        if (source -> next != NULL)
+        {
+            strcat(result, ",");
+            strcat(result, kiaJSON_printUnformatted(source -> next));
+        }
+    }
+    else if (source -> type == object)
+    {
+        if (strcmp(source -> name, ""))
+        {
+            strcat(result, "\"");
+            strcat(result, source -> name);
+            strcat(result, "\":");
+        }
+        strcat(result, "{");
+        if (source -> child != NULL)
+            strcat(result, kiaJSON_printUnformatted(source -> child));
+        strcat(result, "}"); 
+        if (source -> next != NULL)
+        {
+            strcat(result, ",");
+            strcat(result, kiaJSON_printUnformatted(source -> next));
+        }   
+    }
+    //free(result);
+    return result;
+}
+
+// kiaJSON *kiaJSON_parse(char *data)
+// {
+
+// }
+
+void kiaJSON_delete(kiaJSON *ptr)
+{
+    free(ptr);
 }
