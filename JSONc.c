@@ -198,11 +198,6 @@ char *JSONc_printUnformatted (JSONc *source)
     return result;
 }
 
-// JSONc *JSONc_parse(char *data)
-// {
-
-// }
-
 void JSONc_delete(JSONc *ptr)
 {
     free(ptr);
