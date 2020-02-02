@@ -198,6 +198,97 @@ char *JSONc_printUnformatted (JSONc *source)
     return result;
 }
 
+JSONc *JSONc_parse(char *source)
+{
+    static int i = 0;
+    JSONc *result;
+    if (source[i] == '"')
+    {
+        i++;
+        int k = 0;
+        char tmpChar[100];
+        while ((tmpChar[k++] = source[i++]) != '"');
+        tmpChar[k-1] = 0;
+        if (source[i] == ':')
+        {
+            i++;
+            result = JSONc_parse(source);
+            strcpy(result -> name, tmpChar);
+        }
+        else
+            result = JSONc_createString(tmpChar);
+    }
+    else if (source[i] == '[')
+    {
+        result = JSONc_createArray();
+        JSONc *tmp;
+        if (source[++i] != ']')
+        {
+            tmp = JSONc_parse(source);
+            result -> child = tmp;
+        }
+        while (source[i] != ']')
+        {
+            i++;
+            tmp -> next = JSONc_parse(source);
+            tmp = tmp -> next;
+        }
+        i++;
+    }
+    else if (source[i] == '{')
+    {
+        result = JSONc_createObject();
+        JSONc *tmp;
+        if (source[++i] != '}')
+        {
+            tmp = JSONc_parse(source);
+            result -> child = tmp;
+        }
+        while (source[i] != '}')
+        {
+            i++;
+            tmp -> next = JSONc_parse(source);
+            tmp = tmp -> next;
+        }
+        i++;
+    }
+    return result;
+}
+
+int JSONc_getArraySize(JSONc *array)
+{
+    JSONc *tmp = array -> child;
+    int i = 0;
+    while (tmp != NULL)
+    {
+        tmp = tmp -> next;
+        i++;
+    }        
+    return i;
+}
+
+JSONc *JSONc_getObjectItem(JSONc *source, char *name)
+{
+    JSONc *tmp = source -> child;
+    while (tmp != NULL)
+    {
+        if (!strcmp(name, tmp -> name))
+            return tmp;
+        tmp = tmp -> child;
+    }
+    return NULL;
+}
+
+JSONc *JSONc_getArrayItem(JSONc *array, int index)
+{
+    if (index >= JSONc_getArraySize(array))
+        return NULL;
+    JSONc *tmp = array -> child;
+    for (int i = 0; i < index; i++)
+        tmp = tmp -> next;
+    return tmp;
+}
+
 void JSONc_delete(JSONc *ptr)
 {
     free(ptr);
