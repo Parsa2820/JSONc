@@ -1,1 +1,1 @@
-# kiaJSON : Simple JSON parser for C
+# JSONc : Simple JSON creater for C

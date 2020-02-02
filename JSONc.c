@@ -3,20 +3,20 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-enum kiaJSONtype {single, object, array};
+enum JSONctype {single, object, array};
 
-typedef enum kiaJSONtype kiaJSONtype;
+typedef enum JSONctype JSONctype;
 
-struct kiaJSON
+struct JSONc
 {
-    struct kiaJSON *pre, *next, *child, *mom;
+    struct JSONc *pre, *next, *child, *mom;
     char name[100], stringVal[100];
-    kiaJSONtype type;
+    JSONctype type;
 };
 
-typedef struct kiaJSON kiaJSON;
+typedef struct JSONc JSONc;
 
-void init_kiaJSON(kiaJSON *source)
+void init_JSONc(JSONc *source)
 {
     source -> pre = NULL;
     source -> next = NULL;
@@ -26,34 +26,34 @@ void init_kiaJSON(kiaJSON *source)
     strcpy(source -> stringVal, "");
 }
 
-kiaJSON *kiaJSON_createObject()
+JSONc *JSONc_createObject()
 {
-    kiaJSON *ptr = (kiaJSON *)malloc(sizeof(kiaJSON));
-    init_kiaJSON(ptr);
+    JSONc *ptr = (JSONc *)malloc(sizeof(JSONc));
+    init_JSONc(ptr);
     ptr -> type = object;
     return ptr;
 }
 
-kiaJSON *kiaJSON_createString(char *val)
+JSONc *JSONc_createString(char *val)
 {
-    kiaJSON *ptr = (kiaJSON *)malloc(sizeof(kiaJSON));
-    init_kiaJSON(ptr);
+    JSONc *ptr = (JSONc *)malloc(sizeof(JSONc));
+    init_JSONc(ptr);
     strcpy(ptr -> stringVal, val);
     ptr -> type = single;
     return ptr;
 }
 
-kiaJSON *kiaJSON_createArray()
+JSONc *JSONc_createArray()
 {
-    kiaJSON *ptr = (kiaJSON *)malloc(sizeof(kiaJSON));
-    init_kiaJSON(ptr);
+    JSONc *ptr = (JSONc *)malloc(sizeof(JSONc));
+    init_JSONc(ptr);
     ptr -> type = array;
     return ptr;
 }
 
-void kiaJSON_addItem2Object(kiaJSON *sourceObject, char *name, kiaJSON *item)
+void JSONc_addItem2Object(JSONc *sourceObject, char *name, JSONc *item)
 {
-    kiaJSON *tmp;
+    JSONc *tmp;
     strcpy(item -> name, name);
     if (sourceObject -> child == NULL)
     {
@@ -74,9 +74,9 @@ void kiaJSON_addItem2Object(kiaJSON *sourceObject, char *name, kiaJSON *item)
     }    
 }
 
-void kiaJSON_addItem2Array(kiaJSON *sourceArray, kiaJSON *item)
+void JSONc_addItem2Array(JSONc *sourceArray, JSONc *item)
 {
-    kiaJSON *tmp;
+    JSONc *tmp;
     if (sourceArray -> child == NULL)
     {
         sourceArray -> child = item;
@@ -95,7 +95,7 @@ void kiaJSON_addItem2Array(kiaJSON *sourceArray, kiaJSON *item)
     }
 }
 
-void kiaJSON_printUnformatted2Console(kiaJSON *source)
+void JSONc_printUnformatted2Console(JSONc *source)
 {
     if (source -> type == single)
     {
@@ -105,7 +105,7 @@ void kiaJSON_printUnformatted2Console(kiaJSON *source)
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted2Console(source -> next);
+            JSONc_printUnformatted2Console(source -> next);
         }
     }
     else if (source -> type == array)
@@ -114,12 +114,12 @@ void kiaJSON_printUnformatted2Console(kiaJSON *source)
             printf("\"%s\":", source -> name);
         printf("[");
         if (source -> child != NULL)
-            kiaJSON_printUnformatted2Console(source -> child);
+            JSONc_printUnformatted2Console(source -> child);
         printf("]");
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted2Console(source -> next);
+            JSONc_printUnformatted2Console(source -> next);
         }
     }
     else if (source -> type == object)
@@ -128,17 +128,17 @@ void kiaJSON_printUnformatted2Console(kiaJSON *source)
             printf("\"%s\":", source -> name);
         printf("{");
         if (source -> child != NULL)
-            kiaJSON_printUnformatted2Console(source -> child);
+            JSONc_printUnformatted2Console(source -> child);
         printf("}");    
         if (source -> next != NULL)
         {
             printf(",");
-            kiaJSON_printUnformatted2Console(source -> next);
+            JSONc_printUnformatted2Console(source -> next);
         }   
     }
 }
 
-char *kiaJSON_printUnformatted (kiaJSON *source)
+char *JSONc_printUnformatted (JSONc *source)
 {
     char *result = calloc(1, 100);
     if (source -> type == single)
@@ -155,7 +155,7 @@ char *kiaJSON_printUnformatted (kiaJSON *source)
         if (source -> next != NULL)
         {
             strcat(result, ",");
-            strcat(result, kiaJSON_printUnformatted(source -> next));
+            strcat(result, JSONc_printUnformatted(source -> next));
         }
     }
     else if (source -> type == array)
@@ -168,12 +168,12 @@ char *kiaJSON_printUnformatted (kiaJSON *source)
         }
         strcat(result, "[");
         if (source -> child != NULL)
-            strcat(result, kiaJSON_printUnformatted(source -> child));
+            strcat(result, JSONc_printUnformatted(source -> child));
         strcat(result, "]");
         if (source -> next != NULL)
         {
             strcat(result, ",");
-            strcat(result, kiaJSON_printUnformatted(source -> next));
+            strcat(result, JSONc_printUnformatted(source -> next));
         }
     }
     else if (source -> type == object)
@@ -186,24 +186,24 @@ char *kiaJSON_printUnformatted (kiaJSON *source)
         }
         strcat(result, "{");
         if (source -> child != NULL)
-            strcat(result, kiaJSON_printUnformatted(source -> child));
+            strcat(result, JSONc_printUnformatted(source -> child));
         strcat(result, "}"); 
         if (source -> next != NULL)
         {
             strcat(result, ",");
-            strcat(result, kiaJSON_printUnformatted(source -> next));
+            strcat(result, JSONc_printUnformatted(source -> next));
         }   
     }
     //free(result);
     return result;
 }
 
-// kiaJSON *kiaJSON_parse(char *data)
+// JSONc *JSONc_parse(char *data)
 // {
 
 // }
 
-void kiaJSON_delete(kiaJSON *ptr)
+void JSONc_delete(JSONc *ptr)
 {
     free(ptr);
 }
