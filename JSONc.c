@@ -198,60 +198,68 @@ char *JSONc_printUnformatted (JSONc *source)
     return result;
 }
 
-JSONc *JSONc_parse(char *source)
+JSONc *JSONc_parseNotFirst(char *source, int *i)
 {
-    static int i = 0;
     JSONc *result;
-    if (source[i] == '"')
+    if (source[(*i)] == '"')
     {
-        i++;
+        (*i)++;
         int k = 0;
         char tmpChar[100];
-        while ((tmpChar[k++] = source[i++]) != '"');
+        while ((tmpChar[k++] = source[(*i)++]) != '"');
         tmpChar[k-1] = 0;
-        if (source[i] == ':')
+        if (source[(*i)] == ':')
         {
-            i++;
-            result = JSONc_parse(source);
+            (*i)++;
+            result = JSONc_parseNotFirst(source, i);
             strcpy(result -> name, tmpChar);
         }
         else
             result = JSONc_createString(tmpChar);
     }
-    else if (source[i] == '[')
+    else if (source[(*i)] == '[')
     {
         result = JSONc_createArray();
         JSONc *tmp;
-        if (source[++i] != ']')
+        if (source[++(*i)] != ']')
         {
-            tmp = JSONc_parse(source);
+            tmp = JSONc_parseNotFirst(source, i);
             result -> child = tmp;
         }
-        while (source[i] != ']')
+        while (source[(*i)] != ']')
         {
-            i++;
-            tmp -> next = JSONc_parse(source);
+            (*i)++;
+            tmp -> next = JSONc_parseNotFirst(source, i);
             tmp = tmp -> next;
         }
-        i++;
+        (*i)++;
     }
-    else if (source[i] == '{')
+    else if (source[(*i)] == '{')
     {
         result = JSONc_createObject();
         JSONc *tmp;
-        if (source[++i] != '}')
+        if (source[++(*i)] != '}')
         {
-            tmp = JSONc_parse(source);
+            tmp = JSONc_parseNotFirst(source, i);
             result -> child = tmp;
         }
-        while (source[i] != '}')
+        while (source[(*i)] != '}')
         {
-            i++;
-            tmp -> next = JSONc_parse(source);
+            (*i)++;
+            tmp -> next = JSONc_parseNotFirst(source, i);
             tmp = tmp -> next;
         }
-        i++;
+        (*i)++;
     }
+    return result;
+}
+
+JSONc *JSONc_parse(char *source)
+{
+    int *i = calloc(1, sizeof(int));
+    *i = 0;
+    JSONc *result = JSONc_parseNotFirst(source, i);
+    free (i);
     return result;
 }
 
@@ -274,7 +282,7 @@ JSONc *JSONc_getObjectItem(JSONc *source, char *name)
     {
         if (!strcmp(name, tmp -> name))
             return tmp;
-        tmp = tmp -> child;
+        tmp = tmp -> next;
     }
     return NULL;
 }
