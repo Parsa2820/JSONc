@@ -291,5 +291,9 @@ JSONc *JSONc_getArrayItem(JSONc *array, int index)
 
 void JSONc_delete(JSONc *ptr)
 {
+    if (ptr -> child != NULL)
+        JSONc_delete(ptr -> child);
+    if (ptr -> next != NULL)
+        JSONc_delete(ptr -> next);
     free(ptr);
 }
